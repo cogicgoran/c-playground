@@ -19,6 +19,7 @@ void list_locations();
 void add_flight();
 void create_flight(char *origin, char *destination);
 void select_location(char *location);
+void clear_screen(void);
 
 void list_flights();
 
@@ -29,15 +30,17 @@ int main()
     int input_char;
     while (TRUE)
     {
-        // read cli input character
         printf("\n1: Add location\n");
         printf("2: Add flight\n");
         printf("3: List locations\n");
         printf("4: List flights\n");
         printf("9: Exit\n");
         printf("Choose action: ");
-        input_char = getchar();
-        // printf("---------------");
+        while ((input_char = getchar()) == '\n' || input_char == EOF)
+        {
+            // noop
+        }
+        clear_screen();
         switch (input_char)
         {
         case '1':
@@ -53,10 +56,8 @@ int main()
             list_flights();
             break;
         case '9':
-            // Exit program
-            return 0;
+            exit(0);
             break;
-
         default:
             break;
         }
@@ -117,9 +118,12 @@ void create_flight(char *origin, char *destination)
 
 void add_flight()
 {
+    // TODO: i think input needs to be cleared before inserting flight
     char origin_location[4];
     char destination_location[4];
+    printf("Origin location name: ");
     select_location(origin_location);
+    printf("Destination location name: ");
     select_location(destination_location);
     create_flight(origin_location, destination_location);
 }
@@ -129,6 +133,8 @@ void list_locations()
     char read_buffer[1024], existing_location[4];
     FILE *fdest = fopen("dest.txt", "r");
     fread(read_buffer, 1, 1024, fdest);
+    printf("\n------------------------\n");
+    printf("Locations:\n");
     for (int i = 0, j = 0; read_buffer[i] != EOF; i++)
     {
         existing_location[j] = read_buffer[i];
@@ -143,6 +149,7 @@ void list_locations()
             j++;
         }
     }
+    printf("------------------------\n");
 }
 
 int location_exists(char *location)
@@ -180,7 +187,9 @@ void add_location_flow()
 {
     char t[4];
     // TODO: Buffer overflow fix
-    scanf("%s", t);
+    printf("Location name: ");
+    fgetc(stdin);
+    fgets(t, 4, stdin);
     t[3] = '\0';
     if (strlen(t) != 3)
     {
@@ -213,4 +222,9 @@ char *to_upper_case_string(char *str)
         *(str + i) = toupper(*(str + i));
     }
     return str;
+}
+
+void clear_screen(void)
+{
+    system("clear");
 }
