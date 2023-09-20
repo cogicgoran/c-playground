@@ -20,6 +20,8 @@ void add_flight();
 void create_flight(char *origin, char *destination);
 void select_location(char *location);
 
+void list_flights();
+
 char *to_upper_case_string(char *str);
 
 int main()
@@ -31,6 +33,7 @@ int main()
         printf("\n1: Add location\n");
         printf("2: Add flight\n");
         printf("3: List locations\n");
+        printf("4: List flights\n");
         printf("9: Exit\n");
         printf("Choose action: ");
         input_char = getchar();
@@ -46,6 +49,9 @@ int main()
         case '3':
             list_locations();
             break;
+        case '4':
+            list_flights();
+            break;
         case '9':
             // Exit program
             return 0;
@@ -55,6 +61,19 @@ int main()
             break;
         }
     }
+}
+
+void list_flights()
+{
+    char read_buffer[1024];
+    FILE *fp = fopen("flights.txt", "r");
+    if (fp == NULL)
+    {
+        printf("\nCould not open flights file\n");
+        exit(2);
+    }
+    fread(read_buffer, 1, 1024, fp);
+    printf("%s", read_buffer);
 }
 
 void select_location(char *location)
@@ -89,8 +108,9 @@ void create_flight(char *origin, char *destination)
     strcat(write_buffer, origin);
     strcat(write_buffer, filler);
     strcat(write_buffer, destination);
-    strcat(write_buffer, "\n");
-    fwrite(write_buffer, 1, sizeof(write_buffer), fp);
+    write_buffer[10] = '\n';
+    write_buffer[11] = '\0';
+    fwrite(write_buffer, 1, sizeof(write_buffer) - 1, fp); // TODO: Figure out why i need to put -1 in order for unknown character to be not entered
     fclose(fp);
     printf("\nFlight created\n");
 }
